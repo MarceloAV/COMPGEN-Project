@@ -1,2 +1,2 @@
-# TCC
+# COMPGEN Project
 COMPGEN Project
