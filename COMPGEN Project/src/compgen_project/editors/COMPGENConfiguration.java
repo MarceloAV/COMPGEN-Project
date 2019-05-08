@@ -5,6 +5,7 @@ import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
+import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.reconciler.IReconciler;
@@ -106,5 +107,11 @@ public class COMPGENConfiguration extends SourceViewerConfiguration {
 
 		return reconciler;
 	}
-
+	
+	@Override
+	public IHyperlinkDetector[] getHyperlinkDetectors(ISourceViewer sourceViewer) {
+		return (IHyperlinkDetector[]) new COMPGENPreferencesHyperlinkEditor().detectHyperlinks(sourceViewer, sourceViewer.getVisibleRegion(), false);
+		//return super.getHyperlinkDetectors(sourceViewer);
+	}
+	
 }

@@ -5,11 +5,11 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            id="imp_project.editors.IMPEditor"
-            name="IMP Editor"
+            id="compgen_project.editors.COMPGENEditor"
+            name="COMPGEN Editor"
             icon="icons/sample.png"
-            extensions="imp"
-            class="imp_project.editors.IMPEditor"
+            extensions="cpg"
+            class="compgen_project.editors.COMPGENEditor"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor">
       </editor>
    </extension>
