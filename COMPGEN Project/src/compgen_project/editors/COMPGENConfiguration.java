@@ -107,11 +107,13 @@ public class COMPGENConfiguration extends SourceViewerConfiguration {
 
 		return reconciler;
 	}
-	
+
 	@Override
 	public IHyperlinkDetector[] getHyperlinkDetectors(ISourceViewer sourceViewer) {
-		return (IHyperlinkDetector[]) new COMPGENPreferencesHyperlinkEditor().detectHyperlinks(sourceViewer, sourceViewer.getVisibleRegion(), false);
-		//return super.getHyperlinkDetectors(sourceViewer);
+		/*return (IHyperlinkDetector[]) new COMPGENHyperLinkDetector().detectHyperlinks(sourceViewer,
+				sourceViewer.getVisibleRegion(), false);
+				*/
+		return super.getHyperlinkDetectors(sourceViewer);
 	}
-	
+
 }
