@@ -14,15 +14,10 @@ import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 
 public class COMPGENHyperLinkDetector implements IHyperlinkDetector {
 
-	private static final String WORD = "word";
-
 	@Override
 	public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region, boolean canShowMultipleHyperlinks) {
 		IDocument document = textViewer.getDocument();
 		int offset = region.getOffset();
-
-		Hashtable<String, Region> indice = new Hashtable<String, Region>();
-		String text = document.get();
 
 		// extract relevant characters
 		IRegion lineRegion;
@@ -33,7 +28,17 @@ public class COMPGENHyperLinkDetector implements IHyperlinkDetector {
 		} catch (BadLocationException ex) {
 			return null;
 		}
+		
+		Hashtable<String, Region> vIndice = getCandidates(document.get());
+		Region candidateRegion = vIndice.get(candidate);
 
+		if ((candidateRegion.getOffset() <= offset)
+				&& ((candidateRegion.getOffset() + candidateRegion.getLength()) > offset)) {
+			// create link
+			return new IHyperlink[] { new COMPGENHyperLink(candidateRegion) };
+		}
+
+		/*
 		// look for keyword
 		int index = candidate.indexOf(WORD);
 		if (index != -1) {
@@ -46,6 +51,7 @@ public class COMPGENHyperLinkDetector implements IHyperlinkDetector {
 				return new IHyperlink[] { new COMPGENHyperLink(targetRegion) };
 
 		}
+		*/
 
 		return null;
 	}
@@ -78,28 +84,8 @@ public class COMPGENHyperLinkDetector implements IHyperlinkDetector {
 				+ "       NUM '[0-9]+' 'color=green';\r\n" + "       ID  '[a-z]+' 'color=blue';\r\n" + "    }\r\n"
 				+ "    \r\n" + "    \r\n" + "    whitespace = '[ \\n\\t]+';\r\n" + "    start = Com;\r\n" + "}\r\n"
 				+ "";
-
-		String delimiterKeyWords = "|language|class|compile|extends|syntax|this|val|eval|print|asm|forEach|nextLabel|opCodeOf|toString|lexical|whitespace|start|var";
-		String delimiterArithmeticOperators = "|\\+|\\-|\\*|\\/|%|\\+\\+|--";
-		String delimiterRelationalOperators = "|(!=|==|<=|>=|>|<)";
-		String delimiterLogicalOperators = "|&&|\\|\\||<=|>=|>|<";
-		String delimiterAssignmentOperators = "|=|\\+=|-=|\\*=|/=|%=";
-		String delimiterSeparators = "|\\(|\\)|\\{|\\}|\\[|\\]|;|\\.|'(.*?)'|:";
-		String delimiterStringLiterals = "|\\\"([^\\\\\\\"]|\\\\.)*\\\"";
-
-		String delimiters = "\\s+" + delimiterKeyWords + delimiterArithmeticOperators + delimiterRelationalOperators
-				+ delimiterLogicalOperators + delimiterAssignmentOperators + delimiterSeparators
-				+ delimiterStringLiterals;
-
-		String[] tokensEncontrados = code.split(delimiters);
-		ArrayList<String> tokens = new ArrayList<String>(Arrays.asList(tokensEncontrados));
-		tokens.removeAll(Arrays.asList("", null));
-
-		int offset = -1;
-		for (String tokenAtual : tokens) {
-			offset = code.indexOf(tokenAtual, offset + 1);
-			System.out.println("[" + tokenAtual + "] - Offset em " + offset);
-		}
+		
+		Hashtable<String, Region> vIndice = getCandidates(code);
 
 	}
 
@@ -135,6 +121,35 @@ public class COMPGENHyperLinkDetector implements IHyperlinkDetector {
 	public static boolean matchOperators(String pText) {
 		return matchArithmeticOperators(pText) || matchRelationalOperators(pText) || matchLogicalOperators(pText)
 				|| matchAssignmentOperators(pText);
+	}
+	
+	public static Hashtable<String, Region> getCandidates (String pText){
+		
+		Hashtable<String, Region> vIndice = new Hashtable<String, Region>();
+		
+		String aDelimiterKeyWords = "|language|class|compile|extends|syntax|this|val|eval|print|asm|forEach|nextLabel|opCodeOf|toString|lexical|whitespace|start|var";
+		String aDelimiterArithmeticOperators = "|\\+|\\-|\\*|\\/|%|\\+\\+|--";
+		String aDelimiterRelationalOperators = "|(!=|==|<=|>=|>|<)";
+		String aDelimiterLogicalOperators = "|&&|\\|\\||<=|>=|>|<";
+		String aDelimiterAssignmentOperators = "|=|\\+=|-=|\\*=|/=|%=";
+		String aDelimiterSeparators = "|\\(|\\)|\\{|\\}|\\[|\\]|;|\\.|'(.*?)'|:";
+		String aDelimiterStringLiterals = "|\\\"([^\\\\\\\"]|\\\\.)*\\\"";
+		
+		String aDelimiters = "\\s+" + aDelimiterKeyWords + aDelimiterArithmeticOperators + aDelimiterRelationalOperators
+				+ aDelimiterLogicalOperators + aDelimiterAssignmentOperators + aDelimiterSeparators
+				+ aDelimiterStringLiterals;
+		
+		String[] tokensEncontrados = pText.split(aDelimiters);
+		ArrayList<String> Tokens = new ArrayList<String>(Arrays.asList(tokensEncontrados));
+		Tokens.removeAll(Arrays.asList("", null));
+		
+		int vOffSet = -1;
+		for (String vTokenAtual : Tokens) {
+			vOffSet = pText.indexOf(vTokenAtual, vOffSet + 1);
+			vIndice.put(vTokenAtual, new Region (vOffSet, vTokenAtual.length()));
+		}
+		
+		return vIndice;
 	}
 
 }

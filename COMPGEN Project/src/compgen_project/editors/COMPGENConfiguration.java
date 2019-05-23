@@ -2,6 +2,7 @@ package compgen_project.editors;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextDoubleClickStrategy;
+import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
@@ -110,9 +111,8 @@ public class COMPGENConfiguration extends SourceViewerConfiguration {
 
 	@Override
 	public IHyperlinkDetector[] getHyperlinkDetectors(ISourceViewer sourceViewer) {
-		/*return (IHyperlinkDetector[]) new COMPGENHyperLinkDetector().detectHyperlinks(sourceViewer,
-				sourceViewer.getVisibleRegion(), false);
-				*/
+		
+		//return (IHyperlinkDetector[]) new COMPGENHyperLinkDetector().detectHyperlinks((ITextViewer) sourceViewer.getDocument(), sourceViewer.getRangeIndication(), false);
 		return super.getHyperlinkDetectors(sourceViewer);
 	}
 
