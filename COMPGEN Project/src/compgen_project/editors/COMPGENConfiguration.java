@@ -111,9 +111,7 @@ public class COMPGENConfiguration extends SourceViewerConfiguration {
 
 	@Override
 	public IHyperlinkDetector[] getHyperlinkDetectors(ISourceViewer sourceViewer) {
-		
-		//return (IHyperlinkDetector[]) new COMPGENHyperLinkDetector().detectHyperlinks((ITextViewer) sourceViewer.getDocument(), sourceViewer.getRangeIndication(), false);
-		return super.getHyperlinkDetectors(sourceViewer);
+		return new IHyperlinkDetector[] { new COMPGENHyperLinkDetector(editor) };
 	}
 
 }

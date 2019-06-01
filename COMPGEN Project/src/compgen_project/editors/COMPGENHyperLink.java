@@ -5,20 +5,24 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 
 public class COMPGENHyperLink implements IHyperlink {
 
-	private final IRegion fUrlRegion;
+	private COMPGENEditor aEditor;
+	private final IRegion aRegion;
+	private IRegion aTargetRegion;
 
-	public COMPGENHyperLink(IRegion iRegion) {
-		fUrlRegion = iRegion;
+	public COMPGENHyperLink(COMPGENEditor pEditor, IRegion pRegion, IRegion pTargetRegion) {
+		this.aEditor = pEditor;
+		this.aRegion = pRegion;
+		this.aTargetRegion = pTargetRegion;
 	}
 
 	@Override
 	public IRegion getHyperlinkRegion() {
-		return fUrlRegion;
+		return aRegion;
 	}
 
 	@Override
 	public String getHyperlinkText() {
-		return this.fUrlRegion.toString();
+		return this.aRegion.toString();
 	}
 
 	@Override
@@ -28,6 +32,6 @@ public class COMPGENHyperLink implements IHyperlink {
 
 	@Override
 	public void open() {
-		new COMPGENEditor().setHighlightRange(this.fUrlRegion.getOffset(), this.fUrlRegion.getLength(), false);
+		this.aEditor.setHighlightRange(this.aTargetRegion.getOffset(), this.aTargetRegion.getLength(), true);
 	}
 }

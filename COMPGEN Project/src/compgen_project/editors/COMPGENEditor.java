@@ -46,11 +46,13 @@ public class COMPGENEditor extends TextEditor {
 		annotationModel = viewer.getProjectionAnnotationModel();
 	}
 
-	public void updateFoldingStructure(ArrayList positions) {
+	@SuppressWarnings("unchecked")
+	public void updateFoldingStructure(@SuppressWarnings("rawtypes") ArrayList positions) {
 		Annotation[] annotations = new Annotation[positions.size()];
 
 		// this will hold the new annotations along
 		// with their corresponding positions
+		@SuppressWarnings("rawtypes")
 		HashMap newAnnotations = new HashMap();
 
 		for (int i = 0; i < positions.size(); i++) {

@@ -14,44 +14,50 @@ import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 
 public class COMPGENHyperLinkDetector implements IHyperlinkDetector {
 
+	private COMPGENEditor aEditor;
+
+	public COMPGENHyperLinkDetector(COMPGENEditor pEditor) {
+		this.aEditor = pEditor;
+	}
+
 	@Override
 	public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region, boolean canShowMultipleHyperlinks) {
 		IDocument document = textViewer.getDocument();
 		int offset = region.getOffset();
+
+		Region wordRegion;
+		int wordLength;
 
 		// extract relevant characters
 		IRegion lineRegion;
 		String candidate;
 		try {
 			lineRegion = document.getLineInformationOfOffset(offset);
-			candidate = document.get(lineRegion.getOffset(), lineRegion.getLength());
+			wordLength = 3; // TO DO
+			wordRegion = new Region(offset, wordLength);
+			candidate = document.get(offset, wordLength);
 		} catch (BadLocationException ex) {
 			return null;
 		}
-		
+
 		Hashtable<String, Region> vIndice = getCandidates(document.get());
 		Region candidateRegion = vIndice.get(candidate);
 
-		if ((candidateRegion.getOffset() <= offset)
-				&& ((candidateRegion.getOffset() + candidateRegion.getLength()) > offset)) {
-			// create link
-			return new IHyperlink[] { new COMPGENHyperLink(candidateRegion) };
+		if (candidateRegion != null) {
+			return new IHyperlink[] { new COMPGENHyperLink(this.aEditor, wordRegion, candidateRegion) };
 		}
 
 		/*
-		// look for keyword
-		int index = candidate.indexOf(WORD);
-		if (index != -1) {
-
-			// detect region containing keyword
-			IRegion targetRegion = new Region(lineRegion.getOffset() + index, WORD.length());
-			if ((targetRegion.getOffset() <= offset)
-					&& ((targetRegion.getOffset() + targetRegion.getLength()) > offset))
-				// create link
-				return new IHyperlink[] { new COMPGENHyperLink(targetRegion) };
-
-		}
-		*/
+		 * // look for keyword int index = candidate.indexOf(WORD); if (index != -1) {
+		 * 
+		 * // detect region containing keyword IRegion targetRegion = new
+		 * Region(lineRegion.getOffset() + index, WORD.length()); if
+		 * ((targetRegion.getOffset() <= offset) && ((targetRegion.getOffset() +
+		 * targetRegion.getLength()) > offset)) // create link return new IHyperlink[] {
+		 * new COMPGENHyperLink(targetRegion) };
+		 * 
+		 * }
+		 */
 
 		return null;
 	}
@@ -84,7 +90,7 @@ public class COMPGENHyperLinkDetector implements IHyperlinkDetector {
 				+ "       NUM '[0-9]+' 'color=green';\r\n" + "       ID  '[a-z]+' 'color=blue';\r\n" + "    }\r\n"
 				+ "    \r\n" + "    \r\n" + "    whitespace = '[ \\n\\t]+';\r\n" + "    start = Com;\r\n" + "}\r\n"
 				+ "";
-		
+
 		Hashtable<String, Region> vIndice = getCandidates(code);
 
 	}
@@ -122,11 +128,11 @@ public class COMPGENHyperLinkDetector implements IHyperlinkDetector {
 		return matchArithmeticOperators(pText) || matchRelationalOperators(pText) || matchLogicalOperators(pText)
 				|| matchAssignmentOperators(pText);
 	}
-	
-	public static Hashtable<String, Region> getCandidates (String pText){
-		
+
+	public static Hashtable<String, Region> getCandidates(String pText) {
+
 		Hashtable<String, Region> vIndice = new Hashtable<String, Region>();
-		
+
 		String aDelimiterKeyWords = "|language|class|compile|extends|syntax|this|val|eval|print|asm|forEach|nextLabel|opCodeOf|toString|lexical|whitespace|start|var";
 		String aDelimiterArithmeticOperators = "|\\+|\\-|\\*|\\/|%|\\+\\+|--";
 		String aDelimiterRelationalOperators = "|(!=|==|<=|>=|>|<)";
@@ -134,21 +140,23 @@ public class COMPGENHyperLinkDetector implements IHyperlinkDetector {
 		String aDelimiterAssignmentOperators = "|=|\\+=|-=|\\*=|/=|%=";
 		String aDelimiterSeparators = "|\\(|\\)|\\{|\\}|\\[|\\]|;|\\.|'(.*?)'|:";
 		String aDelimiterStringLiterals = "|\\\"([^\\\\\\\"]|\\\\.)*\\\"";
-		
+
 		String aDelimiters = "\\s+" + aDelimiterKeyWords + aDelimiterArithmeticOperators + aDelimiterRelationalOperators
 				+ aDelimiterLogicalOperators + aDelimiterAssignmentOperators + aDelimiterSeparators
 				+ aDelimiterStringLiterals;
-		
+
 		String[] tokensEncontrados = pText.split(aDelimiters);
 		ArrayList<String> Tokens = new ArrayList<String>(Arrays.asList(tokensEncontrados));
 		Tokens.removeAll(Arrays.asList("", null));
-		
+
 		int vOffSet = -1;
 		for (String vTokenAtual : Tokens) {
-			vOffSet = pText.indexOf(vTokenAtual, vOffSet + 1);
-			vIndice.put(vTokenAtual, new Region (vOffSet, vTokenAtual.length()));
+			if (vIndice.get(vTokenAtual) == null) {
+				vOffSet = pText.indexOf(vTokenAtual, vOffSet + 1);
+				vIndice.put(vTokenAtual, new Region(vOffSet, vTokenAtual.length()));
+			}
 		}
-		
+
 		return vIndice;
 	}
 

@@ -13,5 +13,24 @@
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor">
       </editor>
    </extension>
+   
+   <extension
+ point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
+ <target
+   id="compgen_project.editors.COMPGENEditorTarget"
+   name="COMPGEN Editor">
+   <context type="org.eclipse.ui.DefaultTextEditor"/>
+ </target>
+</extension>
+   
+   <extension
+ point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
+ <hyperlinkDetector
+   id="compgen_project.editors.COMPGENHyperLinkDetector"
+   targetId="compgen_project.editors.COMPGENEditorTarget"
+   class="compgen_project.editors.COMPGENHyperLinkDetector"
+   name="%compgenHyperlinkDetector">
+ </hyperlinkDetector>
+</extension>
 
 </plugin>
